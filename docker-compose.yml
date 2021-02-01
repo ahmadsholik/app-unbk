@@ -1,0 +1,40 @@
+version: "2"
+services:
+    www:
+        image: php-apache:7.3
+        ports: 
+            - "80:80"
+        depends_on:
+            - db
+        volumes:
+            - /home/$user/app-unbk:/var/www/html/
+        links:
+            - db:db
+        networks:
+            - default
+    db:
+        image: mariadb:10.4
+        ports: 
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: app-unbk
+            MYSQL_USER: root
+            MYSQL_PASSWORD: p4sw0rd
+            MYSQL_ROOT_PASSWORD: p4sw0rd
+        volumes:
+            - /home/$user/app-unbk/dump:/docker-entrypoint-initdb.d
+            - persistent:/var/lib/mysql
+        networks:
+            - default
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        links: 
+            - db:db
+        ports:
+            - 8001:80
+        environment:
+            MYSQL_USER: root
+            MYSQL_PASSWORD: p4sw0rd
+            MYSQL_ROOT_PASSWORD: p4sw0rd
+volumes:
+    persistent:
